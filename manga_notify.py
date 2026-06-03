@@ -35,6 +35,16 @@ SERIES_URLS = [
     "https://www.go-manga.com/max-level-player-100th/",
     "https://www.go-manga.com/god-level-assassin/",
     "https://www.go-manga.com/dragonslayers-regression/",
+    "https://www.go-manga.com/killer-peter/",
+    "https://www.go-manga.com/return-sword-god-rank/",
+    "https://www.go-manga.com/awakening-purple-thunder/",
+    "https://www.go-manga.com/academys-genius-swordmaster/",
+    "https://www.go-manga.com/return-disaster-class-hero/",
+    "https://www.go-manga.com/am-drako-majstor/",
+    "https://www.go-manga.com/overlord-of-insects/",
+    "https://www.go-manga.com/rebirth-campus-special-forces/",
+    "https://www.go-manga.com/legendary-hero-academy/",
+    "https://www.go-manga.com/mercenary-enrollment/",
 ]
 
 # --- Telegram ---

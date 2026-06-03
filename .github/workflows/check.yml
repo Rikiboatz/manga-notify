@@ -1,0 +1,63 @@
+name: manga-check
+
+on:
+  schedule:
+    # รันทุก 30 นาที (เวลา UTC) — เปลี่ยนเลขได้ เช่น "*/60 * * * *" = ทุก 1 ชม.
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+    # ปุ่มกดรันเองจากหน้าเว็บ เลือก test เพื่อยิงข้อความทดสอบ
+    inputs:
+      mode:
+        description: "เลือก test เพื่อส่งข้อความทดสอบเข้า Telegram"
+        required: false
+        default: "normal"
+        type: choice
+        options:
+          - normal
+          - test
+
+# ต้องมีบรรทัดนี้ เพื่อให้ workflow เขียนไฟล์สถานะกลับเข้า repo ได้
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    # กันไม่ให้รันซ้อนกันถ้ารอบก่อนยังไม่จบ
+    concurrency:
+      group: manga-check
+      cancel-in-progress: false
+    steps:
+      - name: ดึงโค้ดจาก repo
+        uses: actions/checkout@v4
+
+      - name: ติดตั้ง Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: ติดตั้งไลบรารี
+        run: pip install requests beautifulsoup4
+
+      - name: เช็กมังงะ
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ "${{ github.event.inputs.mode }}" = "test" ]; then
+            python manga_notify.py --test
+          else
+            python manga_notify.py
+          fi
+
+      - name: บันทึกสถานะกลับเข้า repo
+        run: |
+          if [ -n "$(git status --porcelain manga_state.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add manga_state.json
+            git commit -m "update manga state [skip ci]"
+            git push
+          else
+            echo "ไม่มีอะไรเปลี่ยน ไม่ต้อง commit"
+          fi
